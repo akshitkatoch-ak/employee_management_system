@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f6fb">
+    <title>PeopleDesk | Employee Management Demo</title>
+    <style>
+        :root {
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #20283a;
+            background: #f5f6fb;
+            font-synthesis: none;
+        }
+        * { box-sizing: border-box; }
+        body { min-width: 320px; min-height: 100vh; margin: 0; }
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+        [hidden] { display: none !important; }
+        .layout { min-height: 100vh; }
+        .sidebar {
+            position: fixed; inset: 0 auto 0 0; z-index: 2; display: flex;
+            width: 238px; flex-direction: column; padding: 26px 17px 18px;
+            border-right: 1px solid #e8eaf1; background: #fff;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px; color: #20283a; font-size: 19px; font-weight: 750; text-decoration: none; }
+        .brand-icon { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 11px; background: #ebe9ff; color: #6758d3; font-weight: 800; }
+        .demo-label { margin: 29px 8px 0; padding: 9px 10px; border: 1px solid #f3d9a1; border-radius: 8px; background: #fff8e9; color: #8b671c; font-size: 11px; font-weight: 750; letter-spacing: .04em; }
+        .nav-title { margin: 34px 10px 12px; color: #969cac; font-size: 10px; font-weight: 750; letter-spacing: .13em; }
+        nav { display: grid; gap: 5px; }
+        .nav-button { display: flex; min-height: 42px; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #667085; text-align: left; font-size: 13px; font-weight: 650; }
+        .nav-button:hover, .nav-button.active { background: #f0efff; color: #594bc5; }
+        .nav-icon { width: 20px; text-align: center; font-size: 16px; }
+        .side-note { margin-top: auto; padding: 12px 9px; color: #969cac; font-size: 11px; line-height: 1.6; }
+        main { min-height: 100vh; margin-left: 238px; padding: 0 38px 44px; }
+        .topbar { display: flex; min-height: 68px; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8eaf1; color: #7a8294; font-size: 12px; }
+        .online { display: inline-flex; align-items: center; gap: 8px; }
+        .online::before { width: 8px; height: 8px; border-radius: 50%; background: #d6a440; content: ""; }
+        .content { width: min(1120px, 100%); margin: 30px auto 0; }
+        .heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 22px; }
+        .eyebrow { margin: 0 0 8px; color: #858da0; font-size: 10px; font-weight: 750; letter-spacing: .14em; }
+        h1, h2, h3, p { margin-top: 0; }
+        h1 { margin-bottom: 7px; font-size: clamp(24px, 3vw, 32px); letter-spacing: -.045em; }
+        h2 { margin-bottom: 6px; font-size: 17px; letter-spacing: -.02em; }
+        h3 { margin-bottom: 12px; font-size: 14px; }
+        .subheading, .muted { color: #838b9d; font-size: 13px; line-height: 1.6; }
+        .subheading { margin: 0; }
+        .btn { display: inline-flex; min-height: 39px; align-items: center; justify-content: center; gap: 7px; padding: 0 14px; border: 1px solid transparent; border-radius: 8px; font-size: 12px; font-weight: 700; }
+        .btn-primary { background: #6658d3; color: #fff; }
+        .btn-primary:hover { background: #5547c1; }
+        .btn-dark { background: #20283a; color: #fff; }
+        .btn-light { border-color: #e4e6ed; background: #fff; color: #4b5568; }
+        .btn-danger { border-color: #f0c7c4; background: #fff; color: #a9463e; }
+        .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 17px; }
+        .stat, .card { border: 1px solid #e8eaf1; border-radius: 11px; background: #fff; box-shadow: 0 3px 12px #25304a05; }
+        .stat { min-height: 127px; padding: 15px; }
+        .stat-icon { display: grid; width: 31px; height: 31px; place-items: center; border-radius: 9px; font-size: 15px; }
+        .purple { background: #f0edff; color: #725fd3; }
+        .green { background: #e8f6ef; color: #43956d; }
+        .orange { background: #fff0e4; color: #c97a34; }
+        .blue { background: #e8f2ff; color: #4c83c5; }
+        .stat-label { display: block; margin-top: 12px; color: #858da0; font-size: 11px; }
+        .stat strong { display: block; margin-top: 4px; font-size: 21px; }
+        .card { margin-bottom: 17px; padding: 19px; }
+        .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+        .card-head .muted { margin: 0; font-size: 12px; }
+        .welcome { display: flex; min-height: 132px; align-items: center; justify-content: space-between; overflow: hidden; background: linear-gradient(110deg, #fff 62%, #f0eeff); }
+        .welcome p { max-width: 610px; margin-bottom: 0; }
+        .welcome-graphic { display: grid; width: 90px; height: 90px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: #e9e6ff; color: #7060d0; font-size: 39px; }
+        .toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 9px; margin-bottom: 15px; }
+        .toolbar input { flex: 1 1 160px; }
+        input, select { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #e1e4eb; border-radius: 7px; outline: 0; background: #fff; color: #20283a; font-size: 12px; }
+        input:focus, select:focus { border-color: #9489e2; box-shadow: 0 0 0 3px #f0efff; }
+        label { display: grid; gap: 6px; color: #5c6577; font-size: 11px; font-weight: 650; }
+        .table-wrap { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 10px 9px; border-bottom: 1px solid #e9ebf1; color: #9299a8; font-size: 9px; letter-spacing: .08em; white-space: nowrap; }
+        td { padding: 11px 9px; border-bottom: 1px solid #f0f1f5; color: #5c6577; font-size: 11px; }
+        tbody tr:last-child td { border-bottom: 0; }
+        .person { display: flex; align-items: center; gap: 8px; color: #20283a; font-weight: 700; white-space: nowrap; }
+        .avatar { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 8px; background: #eeecff; color: #6658d3; font-size: 10px; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 20px; background: #e9f6ef; color: #448567; font-size: 9px; font-weight: 750; }
+        .badge.pending { background: #fff3dc; color: #9a6b1a; }
+        .empty { padding: 24px; color: #878fa0; text-align: center; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 15px; margin-bottom: 16px; border: 1px solid #e9eaf1; border-radius: 9px; background: #fafaff; }
+        .form-grid h3, .actions { grid-column: 1 / -1; margin: 0; }
+        .actions, .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+        .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+        .stack { display: grid; gap: 11px; }
+        .stack .muted { margin-bottom: 6px; }
+        .result { margin-top: 14px; padding: 12px; border-radius: 8px; background: #f6f5ff; color: #5146aa; font-size: 12px; line-height: 1.7; }
+        .result strong { color: #332b79; }
+        .reset-button { border: 0; background: transparent; color: #7a8294; font-size: 11px; text-decoration: underline; }
+        .toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: min(390px, calc(100vw - 32px)); padding: 12px 15px; border-radius: 9px; background: #20283a; box-shadow: 0 8px 24px #17203330; color: #fff; font-size: 12px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s ease; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        @media (max-width: 900px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } main { padding-right: 22px; padding-left: 22px; } }
+        @media (max-width: 650px) {
+            .sidebar { inset: auto 0 0; width: auto; height: 62px; flex-direction: row; padding: 5px; border-top: 1px solid #e8eaf1; border-right: 0; }
+            .sidebar > .brand, .demo-label, .nav-title, .side-note { display: none; }
+            nav { width: 100%; grid-template-columns: repeat(5, 1fr); gap: 2px; }
+            .nav-button { min-height: 49px; flex-direction: column; justify-content: center; gap: 2px; padding: 3px 1px; font-size: 9px; }
+            .nav-icon { font-size: 14px; }
+            main { margin: 0; padding: 0 13px 82px; }
+            .topbar { min-height: 55px; font-size: 10px; }
+            .content { margin-top: 22px; }
+            .heading { align-items: flex-start; }
+            .heading > .btn { min-height: 35px; padding: 0 9px; font-size: 10px; }
+            .stats { gap: 8px; }
+            .stat { min-height: 116px; padding: 12px; }
+            .welcome { min-height: 120px; }
+            .welcome-graphic { width: 58px; height: 58px; margin-left: 8px; font-size: 25px; }
+            .card { padding: 14px; }
+            .two-col, .form-grid { grid-template-columns: 1fr; }
+            .form-grid h3, .actions { grid-column: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <a class="brand" href="#" aria-label="PeopleDesk home"><span class="brand-icon">P</span> PeopleDesk</a>
+        <div class="demo-label">● PRESENTATION DEMO · OFFLINE</div>
+        <p class="nav-title">WORKSPACE</p>
+        <nav aria-label="Main navigation">
+            <button class="nav-button active" data-view="overview"><span class="nav-icon">◫</span>Overview</button>
+            <button class="nav-button" data-view="employees"><span class="nav-icon">♙</span>Employees</button>
+            <button class="nav-button" data-view="attendance"><span class="nav-icon">◷</span>Attendance</button>
+            <button class="nav-button" data-view="payroll"><span class="nav-icon">＄</span>Payroll</button>
+            <button class="nav-button" data-view="performance"><span class="nav-icon">↗</span>Performance</button>
+        </nav>
+        <div class="side-note">Demo data is saved in this browser only.<br><button class="reset-button" id="resetDemo">Reset sample data</button></div>
+    </aside>
+
+    <main>
+        <header class="topbar"><span id="breadcrumb">Workspace / Overview</span><span class="online">Demo mode — no database connection</span></header>
+        <section class="content" data-panel="overview">
+            <div class="heading">
+                <div><p class="eyebrow">PEOPLE OPERATIONS</p><h1>Employee workspace</h1><p class="subheading">A simple overview of your employees and HR activity.</p></div>
+                <button class="btn btn-primary" data-go="employees">＋ Add employee</button>
+            </div>
+            <div class="stats">
+                <article class="stat"><span class="stat-icon purple">♙</span><span class="stat-label">Total employees</span><strong id="employeeCount">0</strong></article>
+                <article class="stat"><span class="stat-icon green">◷</span><span class="stat-label">Present today</span><strong id="attendanceCount">0</strong></article>
+                <article class="stat"><span class="stat-icon orange">＄</span><span class="stat-label">Latest payroll</span><strong id="payrollTotal">—</strong></article>
+                <article class="stat"><span class="stat-icon blue">↗</span><span class="stat-label">Reviews logged</span><strong id="reviewCount">0</strong></article>
+            </div>
+            <article class="card welcome">
+                <div><p class="eyebrow">EMPLOYEE MANAGEMENT SYSTEM</p><h2>Welcome to your HR dashboard</h2><p class="muted">Show how employee records, attendance, payroll, and performance reviews work together. Use the menu to try each feature.</p></div>
+                <div class="welcome-graphic" aria-hidden="true">✳</div>
+            </article>
+            <article class="card">
+                <div class="card-head"><div><h2>Employee directory</h2><p class="muted">Sample team members</p></div><button class="btn btn-light" data-go="employees">Open directory →</button></div>
+                <div class="table-wrap"><table><thead><tr><th>EMPLOYEE</th><th>DEPARTMENT</th><th>JOB TITLE</th><th>STATUS</th></tr></thead><tbody id="recentRows"></tbody></table></div>
+            </article>
+        </section>
+
+        <section class="content" data-panel="employees" hidden>
+            <div class="heading"><div><p class="eyebrow">PEOPLE DIRECTORY</p><h1>Employees</h1><p class="subheading">Search staff or add a new employee to the demo.</p></div><button class="btn btn-primary" id="toggleEmployeeForm">＋ Add employee</button></div>
+            <article class="card">
+                <form id="employeeForm" class="form-grid" hidden>
+                    <h3>New employee information</h3>
+                    <label>First name<input name="firstName" required maxlength="50" placeholder="e.g. Maya"></label>
+                    <label>Last name<input name="lastName" required maxlength="50" placeholder="e.g. Shah"></label>
+                    <label>Email<input name="email" type="email" required placeholder="name@example.com"></label>
+                    <label>Department<input name="department" required maxlength="50" placeholder="e.g. Engineering"></label>
+                    <label>Job title<input name="jobTitle" required maxlength="60" placeholder="e.g. Analyst"></label>
+                    <label>Monthly salary<input name="salary" type="number" min="0" step="0.01" required placeholder="5000"></label>
+                    <div class="actions"><button class="btn btn-primary" type="submit">Save employee</button><button class="btn btn-light" type="button" id="cancelEmployee">Cancel</button></div>
+                </form>
+                <form class="toolbar" id="employeeSearch"><input name="search" placeholder="Search name, department, or job title…" aria-label="Search employees"><button class="btn btn-dark">Search</button><button type="reset" class="btn btn-light">Clear</button></form>
+                <div class="table-wrap"><table><thead><tr><th>ID</th><th>EMPLOYEE</th><th>DEPARTMENT</th><th>JOB TITLE</th><th>EMAIL</th><th>STATUS</th></tr></thead><tbody id="employeeRows"></tbody></table></div>
+            </article>
+        </section>
+
+        <section class="content" data-panel="attendance" hidden>
+            <div class="heading"><div><p class="eyebrow">TIME &amp; ATTENDANCE</p><h1>Attendance</h1><p class="subheading">Record a clock-in or clock-out for an employee.</p></div></div>
+            <div class="two-col">
+                <article class="card">
+                    <h2>Record attendance</h2><p class="muted">Choose an employee. The demo records your computer's current time.</p>
+                    <form id="attendanceForm" class="stack"><label>Employee<select name="employeeId" class="employee-options" required></select></label>
+                        <div class="button-row"><button class="btn btn-primary" name="action" value="in">Clock in</button><button class="btn btn-dark" name="action" value="out">Clock out</button></div>
+                    </form>
+                </article>
+                <article class="card"><h2>Today's attendance</h2><p class="muted">Recorded demo activity for today.</p>
+                    <div class="table-wrap"><table><thead><tr><th>EMPLOYEE</th><th>STATUS</th><th>LAST ACTION</th></tr></thead><tbody id="attendanceRows"></tbody></table></div>
+                </article>
+            </div>
+        </section>
+
+        <section class="content" data-panel="payroll" hidden>
+            <div class="heading"><div><p class="eyebrow">COMPENSATION</p><h1>Payroll</h1><p class="subheading">Create a sample payslip using the employee salary on file.</p></div></div>
+            <div class="two-col">
+                <article class="card"><h2>Generate payslip</h2><p class="muted">This is a simple demo calculation, not a production payroll engine.</p>
+                    <form id="payrollForm" class="stack"><label>Employee<select name="employeeId" class="employee-options" required></select></label>
+                        <label>Payroll month<input name="period" type="month" required></label>
+                        <label>Bonus<input name="bonus" type="number" min="0" step="0.01" value="0"></label>
+                        <label>Deductions<input name="deductions" type="number" min="0" step="0.01" value="0"></label>
+                        <button class="btn btn-primary" type="submit">Generate payslip</button>
+                    </form><div class="result" id="payslipResult" hidden></div>
+                </article>
+                <article class="card"><h2>Payroll history</h2><p class="muted">Payslips generated in this browser session.</p>
+                    <div class="table-wrap"><table><thead><tr><th>EMPLOYEE</th><th>PERIOD</th><th>NET PAY</th></tr></thead><tbody id="payrollRows"></tbody></table></div>
+                </article>
+            </div>
+        </section>
+
+        <section class="content" data-panel="performance" hidden>
+            <div class="heading"><div><p class="eyebrow">GROWTH &amp; DEVELOPMENT</p><h1>Performance reviews</h1><p class="subheading">Add a sample review and see it in the report.</p></div></div>
+            <article class="card">
+                <form id="reviewForm" class="form-grid">
+                    <h3>Record performance review</h3>
+                    <label>Employee<select name="employeeId" class="employee-options" required></select></label>
+                    <label>Review date<input name="reviewDate" type="date" required></label>
+                    <label>Rating<select name="rating" required><option value="">Select rating</option><option value="5">5 — Excellent</option><option value="4">4 — Strong</option><option value="3">3 — Meets expectations</option><option value="2">2 — Needs improvement</option><option value="1">1 — Unsatisfactory</option></select></label>
+                    <label>Feedback<input name="feedback" required maxlength="180" placeholder="Key strengths or growth areas"></label>
+                    <div class="actions"><button class="btn btn-primary" type="submit">Save review</button></div>
+                </form>
+                <div class="card-head"><div><h2>Performance report</h2><p class="muted">Reviews currently saved in this demo.</p></div></div>
+                <div class="table-wrap"><table><thead><tr><th>EMPLOYEE</th><th>DEPARTMENT</th><th>REVIEW DATE</th><th>RATING</th><th>FEEDBACK</th></tr></thead><tbody id="reviewRows"></tbody></table></div>
+            </article>
+        </section>
+    </main>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+    "use strict";
+    (() => {
+        const storageKey = "peopledesk-vscode-demo-v1";
+        const initialData = {
+            employees: [
+                { id: 1001, firstName: "Ava", lastName: "Patel", email: "ava.patel@example.com", department: "Engineering", jobTitle: "Software Developer", salary: 6200, status: "Active" },
+                { id: 1002, firstName: "Noah", lastName: "Kim", email: "noah.kim@example.com", department: "Human Resources", jobTitle: "HR Coordinator", salary: 4800, status: "Active" },
+                { id: 1003, firstName: "Mia", lastName: "Garcia", email: "mia.garcia@example.com", department: "Finance", jobTitle: "Payroll Analyst", salary: 5300, status: "Active" },
+                { id: 1004, firstName: "Leo", lastName: "Morgan", email: "leo.morgan@example.com", department: "Engineering", jobTitle: "QA Engineer", salary: 5700, status: "Active" }
+            ],
+            attendance: [],
+            payroll: [],
+            reviews: [
+                { employeeId: 1001, date: "2026-09-15", rating: 5, feedback: "Delivered key project milestones." },
+                { employeeId: 1003, date: "2026-09-18", rating: 4, feedback: "Reliable and detail-oriented." }
+            ]
+        };
+        let data;
+        try {
+            data = JSON.parse(localStorage.getItem(storageKey)) || structuredClone(initialData);
+        } catch {
+            data = structuredClone(initialData);
+        }
+        const $ = (selector, root = document) => root.querySelector(selector);
+        const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+        const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[char]);
+        const money = (value) => new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(Number(value) || 0);
+        let toastTimer;
+
+        function save() {
+            localStorage.setItem(storageKey, JSON.stringify(data));
+            render();
+        }
+        function notify(message) {
+            const toast = $("#toast");
+            toast.textContent = message;
+            toast.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+        }
+        function employee(id) {
+            return data.employees.find((person) => person.id === Number(id));
+        }
+        function personName(person) {
+            return person ? `${person.firstName} ${person.lastName}` : "Unknown employee";
+        }
+        function emptyRow(columns, message) {
+            return `<tr><td class="empty" colspan="${columns}">${esc(message)}</td></tr>`;
+        }
+        function renderEmployees(search = "") {
+            const query = search.trim().toLowerCase();
+            const rows = data.employees.filter((person) =>
+                [person.id, person.firstName, person.lastName, person.department, person.jobTitle, person.email]
+                    .join(" ").toLowerCase().includes(query));
+            $("#employeeRows").innerHTML = rows.length ? rows.map((person) => `
+                <tr><td>${person.id}</td>
+                <td><span class="person"><span class="avatar">${esc(person.firstName[0] + person.lastName[0])}</span>${esc(personName(person))}</span></td>
+                <td>${esc(person.department)}</td><td>${esc(person.jobTitle)}</td><td>${esc(person.email)}</td>
+                <td><span class="badge">${esc(person.status)}</span></td></tr>`).join("") : emptyRow(6, "No employees found.");
+            const recent = [...data.employees].slice(-5).reverse();
+            $("#recentRows").innerHTML = recent.length ? recent.map((person) => `
+                <tr><td><span class="person"><span class="avatar">${esc(person.firstName[0] + person.lastName[0])}</span>${esc(personName(person))}</span></td>
+                <td>${esc(person.department)}</td><td>${esc(person.jobTitle)}</td><td><span class="badge">${esc(person.status)}</span></td></tr>`).join("") : emptyRow(4, "No employees have been added.");
+            $$(".employee-options").forEach((select) => {
+                const current = select.value;
+                select.innerHTML = data.employees.length
+                    ? data.employees.map((person) => `<option value="${person.id}">${esc(personName(person))} · ${person.id}</option>`).join("")
+                    : '<option value="">Add an employee first</option>';
+                if (data.employees.some((person) => String(person.id) === current)) select.value = current;
+                select.disabled = data.employees.length === 0;
+            });
+        }
+        function renderAttendance() {
+            const today = new Date().toLocaleDateString();
+            const todaysRows = data.attendance.filter((record) => new Date(record.time).toLocaleDateString() === today);
+            $("#attendanceCount").textContent = String(new Set(todaysRows.filter((record) => record.action === "in").map((record) => record.employeeId)).size);
+            $("#attendanceRows").innerHTML = todaysRows.length ? [...todaysRows].reverse().map((record) => `
+                <tr><td>${esc(personName(employee(record.employeeId)))}</td>
+                <td><span class="badge ${record.action === "out" ? "pending" : ""}">${record.action === "in" ? "Clocked in" : "Clocked out"}</span></td>
+                <td>${esc(new Date(record.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}</td></tr>`).join("") : emptyRow(3, "No attendance has been recorded today.");
+        }
+        function renderPayroll() {
+            const latest = data.payroll[data.payroll.length - 1];
+            $("#payrollTotal").textContent = latest ? money(latest.netPay) : "—";
+            $("#payrollRows").innerHTML = data.payroll.length ? [...data.payroll].reverse().map((slip) => `
+                <tr><td>${esc(personName(employee(slip.employeeId)))}</td><td>${esc(slip.period)}</td><td>${money(slip.netPay)}</td></tr>`).join("") : emptyRow(3, "No demo payslips generated yet.");
+        }
+        function renderReviews() {
+            $("#reviewCount").textContent = String(data.reviews.length);
+            $("#reviewRows").innerHTML = data.reviews.length ? [...data.reviews].reverse().map((review) => {
+                const person = employee(review.employeeId);
+                return `<tr><td>${esc(personName(person))}</td><td>${esc(person?.department ?? "—")}</td>
+                    <td>${esc(review.date)}</td><td><span class="badge">${esc(review.rating)} / 5</span></td>
+                    <td>${esc(review.feedback)}</td></tr>`;
+            }).join("") : emptyRow(5, "No performance reviews have been added.");
+        }
+        function render() {
+            $("#employeeCount").textContent = String(data.employees.length);
+            renderEmployees($("#employeeSearch").elements.search.value);
+            renderAttendance();
+            renderPayroll();
+            renderReviews();
+        }
+        function showView(name) {
+            $$("[data-panel]").forEach((panel) => { panel.hidden = panel.dataset.panel !== name; });
+            $$(".nav-button").forEach((button) => button.classList.toggle("active", button.dataset.view === name));
+            const labels = { overview: "Overview", employees: "Employees", attendance: "Attendance", payroll: "Payroll", performance: "Performance" };
+            $("#breadcrumb").textContent = `Workspace / ${labels[name]}`;
+        }
+
+        $$(".nav-button").forEach((button) => button.addEventListener("click", () => showView(button.dataset.view)));
+        $$("[data-go]").forEach((button) => button.addEventListener("click", () => showView(button.dataset.go)));
+        $("#employeeSearch").addEventListener("submit", (event) => {
+            event.preventDefault();
+            renderEmployees(event.currentTarget.elements.search.value);
+        });
+        $("#employeeSearch").addEventListener("reset", () => setTimeout(() => renderEmployees(), 0));
+        $("#toggleEmployeeForm").addEventListener("click", () => { $("#employeeForm").hidden = !$("#employeeForm").hidden; });
+        $("#cancelEmployee").addEventListener("click", () => { $("#employeeForm").reset(); $("#employeeForm").hidden = true; });
+        $("#employeeForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const fields = Object.fromEntries(new FormData(form));
+            const duplicate = data.employees.some((person) => person.email.toLowerCase() === fields.email.trim().toLowerCase());
+            if (duplicate) { notify("An employee with that email already exists."); return; }
+            data.employees.push({
+                id: Math.max(1000, ...data.employees.map((person) => person.id)) + 1,
+                firstName: fields.firstName.trim(), lastName: fields.lastName.trim(),
+                email: fields.email.trim(), department: fields.department.trim(),
+                jobTitle: fields.jobTitle.trim(), salary: Number(fields.salary), status: "Active"
+            });
+            form.reset();
+            form.hidden = true;
+            save();
+            notify("Employee added to the demo.");
+        });
+        $("#attendanceForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const action = event.submitter?.value;
+            if (!action) return;
+            const employeeId = Number(event.currentTarget.elements.employeeId.value);
+            const last = [...data.attendance].reverse().find((record) => record.employeeId === employeeId);
+            if (action === "in" && last?.action === "in" && new Date(last.time).toLocaleDateString() === new Date().toLocaleDateString()) {
+                notify("This employee is already clocked in.");
+                return;
+            }
+            if (action === "out" && (!last || last.action !== "in" || new Date(last.time).toLocaleDateString() !== new Date().toLocaleDateString())) {
+                notify("Clock in before recording a clock-out.");
+                return;
+            }
+            data.attendance.push({ employeeId, action, time: new Date().toISOString() });
+            save();
+            notify(action === "in" ? "Clock-in recorded in the demo." : "Clock-out recorded in the demo.");
+        });
+        $("#payrollForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const fields = Object.fromEntries(new FormData(event.currentTarget));
+            const person = employee(fields.employeeId);
+            if (!person) { notify("Add an employee before generating a payslip."); return; }
+            const period = fields.period;
+            const bonus = Number(fields.bonus) || 0;
+            const deductions = Number(fields.deductions) || 0;
+            const netPay = Math.max(0, Number(person.salary) + bonus - deductions);
+            const slip = { employeeId: person.id, period, basePay: person.salary, bonus, deductions, netPay };
+            data.payroll.push(slip);
+            save();
+            $("#payslipResult").innerHTML = `<strong>${esc(personName(person))}</strong> · ${esc(period)}<br>
+                Base salary: ${money(slip.basePay)} &nbsp; Bonus: ${money(bonus)} &nbsp; Deductions: ${money(deductions)}<br>
+                <strong>Net pay: ${money(netPay)}</strong>`;
+            $("#payslipResult").hidden = false;
+            notify("Demo payslip generated.");
+        });
+        $("#reviewForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const fields = Object.fromEntries(new FormData(event.currentTarget));
+            data.reviews.push({
+                employeeId: Number(fields.employeeId), date: fields.reviewDate,
+                rating: Number(fields.rating), feedback: fields.feedback.trim()
+            });
+            save();
+            event.currentTarget.reset();
+            notify("Performance review added to the demo.");
+        });
+        $("#resetDemo").addEventListener("click", () => {
+            if (!window.confirm("Reset all demo changes and restore the sample employees?")) return;
+            data = structuredClone(initialData);
+            save();
+            $("#payslipResult").hidden = true;
+            notify("Sample data restored.");
+        });
+        render();
+    })();
+</script>
+</body>
+</html>

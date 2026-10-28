@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employee Management System</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #20283a;
+      background: #f5f6fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body { margin: 0; }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: 230px;
+      padding: 24px 16px;
+      background: white;
+      border-right: 1px solid #e6e8ef;
+    }
+
+    .brand {
+      margin: 0 0 24px;
+      font-size: 21px;
+      font-weight: 750;
+    }
+
+    .demo-label {
+      margin-bottom: 25px;
+      padding: 9px;
+      border-radius: 8px;
+      background: #fff5dc;
+      color: #876316;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    nav { display: grid; gap: 6px; }
+
+    nav button {
+      padding: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: white;
+      color: #687185;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    nav button:hover, nav button.active {
+      background: #efedff;
+      color: #5c4bc5;
+    }
+
+    main {
+      max-width: 1200px;
+      min-height: 100vh;
+      margin-left: 230px;
+      padding: 24px 36px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 0 18px;
+      border-bottom: 1px solid #e6e8ef;
+      color: #737c8f;
+      font-size: 13px;
+    }
+
+    .offline { color: #9a6b1a; }
+
+    .page { margin-top: 28px; }
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #777f91;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+    }
+
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    h2 { margin: 0 0 8px; font-size: 18px; }
+    .muted { color: #7d8698; font-size: 13px; line-height: 1.5; }
+
+    .heading, .card-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 13px;
+      margin-bottom: 16px;
+    }
+
+    .stat, .card {
+      padding: 18px;
+      border: 1px solid #e6e8ef;
+      border-radius: 11px;
+      background: white;
+    }
+
+    .stat span {
+      display: block;
+      color: #7d8698;
+      font-size: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 7px;
+      font-size: 23px;
+    }
+
+    .card { margin-bottom: 16px; }
+    .card-heading { margin-bottom: 14px; }
+
+    .button {
+      min-height: 39px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #6658d3;
+      color: white;
+      font-weight: 650;
+    }
+
+    .button:hover { background: #5547c1; }
+
+    .button.secondary { background: #222b3d; }
+    .button.light {
+      border: 1px solid #e2e4eb;
+      background: white;
+      color: #394256;
+    }
+
+    .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 9px;
+      margin: 14px 0;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 39px;
+      padding: 8px 10px;
+      border: 1px solid #dfe2e9;
+      border-radius: 7px;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid #d9d4ff;
+      border-color: #8173dc;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #545d70;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .toolbar input { flex: 1 1 200px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 14px 0;
+      padding: 15px;
+      border: 1px solid #e6e8ef;
+      border-radius: 9px;
+      background: #fafaff;
+    }
+
+    .form-grid h3, .form-grid .button-row { grid-column: 1 / -1; }
+    .form-grid h3 { margin: 0; }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .stack { display: grid; gap: 12px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 11px 9px;
+      border-bottom: 1px solid #edf0f4;
+      font-size: 12px;
+    }
+
+    th {
+      color: #7f8798;
+      font-size: 10px;
+      letter-spacing: .7px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      background: #e8f5ed;
+      color: #438360;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .result {
+      margin-top: 14px;
+      padding: 13px;
+      border-radius: 8px;
+      background: #f0efff;
+      color: #5145a8;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: #20283a;
+      color: white;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .toast.show { opacity: 1; }
+
+    @media (max-width: 800px) {
+      .sidebar { width: 175px; }
+      main { margin-left: 175px; padding: 20px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .sidebar {
+        inset: auto 0 0;
+        width: 100%;
+        padding: 6px;
+        border-top: 1px solid #e6e8ef;
+        border-right: 0;
+      }
+
+      .brand, .demo-label { display: none; }
+
+      nav {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 2px;
+      }
+
+      nav button {
+        padding: 9px 3px;
+        text-align: center;
+        font-size: 10px;
+      }
+
+      main { margin: 0; padding: 16px 13px 85px; }
+      .topbar { font-size: 11px; }
+      .two-columns, .form-grid { grid-template-columns: 1fr; }
+      .form-grid h3, .form-grid .button-row { grid-column: auto; }
+      h1 { font-size: 25px; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">◈ PeopleDesk</div>
+    <div class="demo-label">● PRESENTATION DEMO — SAMPLE DATA</div>
+    <nav>
+      <button class="active" data-page="overview">▦ Overview</button>
+      <button data-page="employees">♙ Employees</button>
+      <button data-page="attendance">◷ Attendance</button>
+      <button data-page="payroll">＄ Payroll</button>
+      <button data-page="performance">↗ Performance</button>
+    </nav>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <span id="breadcrumb">Workspace / Overview</span>
+      <span class="offline">Demo mode — not connected to Oracle</span>
+    </header>
+
+    <section class="page" data-section="overview">
+      <div class="heading">
+        <div>
+          <p class="eyebrow">PEOPLE OPERATIONS</p>
+          <h1>Employee workspace</h1>
+          <p class="muted">Manage employee details and explore HR features.</p>
+        </div>
+        <button class="button" data-open="employees">＋ Add employee</button>
+      </div>
+
+      <div class="stats">
+        <article class="stat"><span>Total employees</span><strong id="employeeCount">0</strong></article>
+        <article class="stat"><span>Present today</span><strong id="presentCount">0</strong></article>
+        <article class="stat"><span>Latest sample payslip</span><strong id="latestPay">—</strong></article>
+        <article class="stat"><span>Performance reviews</span><strong id="reviewCount">0</strong></article>
+      </div>
+
+      <article class="card">
+        <h2>Welcome to your HR dashboard</h2>
+        <p class="muted">Use the menu to add employees, record attendance, generate a sample payslip, or enter a performance review. Demo changes are stored in this browser.</p>
+      </article>
+
+      <article class="card">
+        <div class="card-heading">
+          <div><h2>Employee directory</h2><p class="muted">Sample team members</p></div>
+          <button class="button light" data-open="employees">View employees →</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>EMPLOYEE</th><th>DEPARTMENT</th><th>JOB TITLE</th><th>STATUS</th></tr></thead>
+            <tbody id="recentEmployees"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="page" data-section="employees" hidden>
+      <div class="heading">
+        <div><p class="eyebrow">PEOPLE DIRECTORY</p><h1>Employees</h1><p class="muted">Search or add an employee.</p></div>
+        <button class="button" id="showEmployeeForm">＋ Add employee</button>
+      </div>
+
+      <article class="card">
+        <form id="employeeForm" class="form-grid" hidden>
+          <h3>New employee information</h3>
+          <label>First name<input name="firstName" required></label>
+          <label>Last name<input name="lastName" required></label>
+          <label>Email<input name="email" type="email" required></label>
+          <label>Department<input name="department" required></label>
+          <label>Job title<input name="jobTitle" required></label>
+          <label>Monthly salary<input name="salary" type="number" min="0" step="0.01" required></label>
+          <div class="button-row">
+            <button class="button" type="submit">Save employee</button>
+            <button class="button light" type="button" id="cancelEmployee">Cancel</button>
+          </div>
+        </form>
+
+        <form id="searchForm" class="toolbar">
+          <input name="search" placeholder="Search name, department, or job title">
+          <button class="button secondary" type="submit">Search</button>
+          <button class="button light" type="reset">Clear</button>
+        </form>
+
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>ID</th><th>EMPLOYEE</th><th>DEPARTMENT</th><th>JOB TITLE</th><th>EMAIL</th></tr></thead>
+            <tbody id="employeeRows"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="page" data-section="attendance" hidden>
+      <div class="heading">
+        <div><p class="eyebrow">TIME &amp; ATTENDANCE</p><h1>Attendance</h1><p class="muted">Record an employee's clock-in and clock-out.</p></div>
+      </div>
+
+      <div class="two-columns">
+        <article class="card">
+          <h2>Record attendance</h2>
+          <p class="muted">The demo uses your computer's current time.</p>
+          <form id="attendanceForm" class="stack">
+            <label>Employee<select name="employeeId" class="employeeOptions" required></select></label>
+            <div class="button-row">
+              <button class="button" name="action" value="in">Clock in</button>
+              <button class="button secondary" name="action" value="out">Clock out</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Today's attendance</h2>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>EMPLOYEE</th><th>ACTION</th><th>TIME</th></tr></thead>
+              <tbody id="attendanceRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="page" data-section="payroll" hidden>
+      <div class="heading">
+        <div><p class="eyebrow">COMPENSATION</p><h1>Payroll</h1><p class="muted">Generate a sample payslip.</p></div>
+      </div>
+
+      <div class="two-columns">
+        <article class="card">
+          <h2>Generate payslip</h2>
+          <p class="muted">Demo calculation: salary + bonus − deductions.</p>
+          <form id="payrollForm" class="stack">
+            <label>Employee<select name="employeeId" class="employeeOptions" required></select></label>
+            <label>Payroll month<input name="period" type="month" required></label>
+            <label>Bonus<input name="bonus" type="number" min="0" step="0.01" value="0"></label>
+            <label>Deductions<input name="deductions" type="number" min="0" step="0.01" value="0"></label>
+            <button class="button" type="submit">Generate payslip</button>
+          </form>
+          <div class="result" id="payslipResult" hidden></div>
+        </article>
+
+        <article class="card">
+          <h2>Generated payslips</h2>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>EMPLOYEE</th><th>MONTH</th><th>NET PAY</th></tr></thead>
+              <tbody id="payrollRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="page" data-section="performance" hidden>
+      <div class="heading">
+        <div><p class="eyebrow">GROWTH &amp; DEVELOPMENT</p><h1>Performance reviews</h1><p class="muted">Record a sample employee review.</p></div>
+      </div>
+
+      <article class="card">
+        <form id="reviewForm" class="form-grid">
+          <h3>New performance review</h3>
+          <label>Employee<select name="employeeId" class="employeeOptions" required></select></label>
+          <label>Review date<input name="date" type="date" required></label>
+          <label>Rating
+            <select name="rating" required>
+              <option value="">Select rating</option>
+              <option value="5">5 — Excellent</option>
+              <option value="4">4 — Strong</option>
+              <option value="3">3 — Meets expectations</option>
+              <option value="2">2 — Needs improvement</option>
+              <option value="1">1 — Unsatisfactory</option>
+            </select>
+          </label>
+          <label>Feedback<input name="feedback" required placeholder="Add review feedback"></label>
+          <div class="button-row"><button class="button" type="submit">Save review</button></div>
+        </form>
+
+        <h2>Review report</h2>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>EMPLOYEE</th><th>DEPARTMENT</th><th>DATE</th><th>RATING</th><th>FEEDBACK</th></tr></thead>
+            <tbody id="reviewRows"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const starterData = {
+      employees: [
+        { id: 1001, firstName: "Ava", lastName: "Patel", email: "ava@example.com", department: "Engineering", jobTitle: "Developer", salary: 6200 },
+        { id: 1002, firstName: "Noah", lastName: "Kim", email: "noah@example.com", department: "Human Resources", jobTitle: "HR Coordinator", salary: 4800 },
+        { id: 1003, firstName: "Mia", lastName: "Garcia", email: "mia@example.com", department: "Finance", jobTitle: "Payroll Analyst", salary: 5300 }
+      ],
+      attendance: [],
+      payroll: [],
+      reviews: [
+        { employeeId: 1001, date: "2026-09-15", rating: 5, feedback: "Delivered key project milestones." }
+      ]
+    };
+
+    const storageKey = "employee-management-demo";
+    let data;
+
+    try {
+      data = JSON.parse(localStorage.getItem(storageKey)) || structuredClone(starterData);
+    } catch {
+      data = structuredClone(starterData);
+    }
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+    let toastTimer;
+
+    function money(amount) {
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: "USD"
+      }).format(Number(amount) || 0);
+    }
+
+    function employeeById(id) {
+      return data.employees.find((person) => person.id === Number(id));
+    }
+
+    function employeeName(person) {
+      return person ? `${person.firstName} ${person.lastName}` : "Unknown employee";
+    }
+
+    function addCell(row, value) {
+      const cell = document.createElement("td");
+      cell.textContent = value ?? "";
+      row.appendChild(cell);
+    }
+
+    function showToast(message) {
+      const toast = $("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function saveAndRender() {
+      localStorage.setItem(storageKey, JSON.stringify(data));
+      render();
+    }
+
+    function renderEmployees(search = "") {
+      const query = search.trim().toLowerCase();
+      const matches = data.employees.filter((person) =>
+        `${person.id} ${person.firstName} ${person.lastName} ${person.department} ${person.jobTitle} ${person.email}`
+          .toLowerCase().includes(query)
+      );
+
+      const employeeRows = $("#employeeRows");
+      employeeRows.replaceChildren();
+
+      if (matches.length === 0) {
+        const row = employeeRows.insertRow();
+        addCell(row, "No employees found.");
+        row.firstChild.colSpan = 5;
+        return;
+      }
+
+      matches.forEach((person) => {
+        const row = employeeRows.insertRow();
+        addCell(row, person.id);
+        addCell(row, employeeName(person));
+        addCell(row, person.department);
+        addCell(row, person.jobTitle);
+        addCell(row, person.email);
+      });
+    }
+
+    function renderRecentEmployees() {
+      const tbody = $("#recentEmployees");
+      tbody.replaceChildren();
+
+      data.employees.slice(-5).reverse().forEach((person) => {
+        const row = tbody.insertRow();
+        addCell(row, employeeName(person));
+        addCell(row, person.department);
+        addCell(row, person.jobTitle);
+
+        const statusCell = row.insertCell();
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = "Active";
+        statusCell.appendChild(badge);
+      });
+    }
+
+    function renderEmployeeOptions() {
+      $$(".employeeOptions").forEach((select) => {
+        const selected = select.value;
+        select.replaceChildren();
+
+        data.employees.forEach((person) => {
+          const option = document.createElement("option");
+          option.value = person.id;
+          option.textContent = `${employeeName(person)} — ${person.id}`;
+          select.appendChild(option);
+        });
+
+        if (data.employees.some((person) => String(person.id) === selected)) {
+          select.value = selected;
+        }
+      });
+    }
+
+    function renderAttendance() {
+      const today = new Date().toLocaleDateString();
+      const todayRecords = data.attendance.filter(
+        (record) => new Date(record.time).toLocaleDateString() === today
+      );
+
+      $("#presentCount").textContent = new Set(
+        todayRecords.filter((record) => record.action === "Clock in")
+          .map((record) => record.employeeId)
+      ).size;
+
+      const tbody = $("#attendanceRows");
+      tbody.replaceChildren();
+
+      if (!todayRecords.length) {
+        const row = tbody.insertRow();
+        addCell(row, "No attendance recorded today.");
+        row.firstChild.colSpan = 3;
+        return;
+      }
+
+      [...todayRecords].reverse().forEach((record) => {
+        const row = tbody.insertRow();
+        addCell(row, employeeName(employeeById(record.employeeId)));
+        addCell(row, record.action);
+        addCell(row, new Date(record.time).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit"
+        }));
+      });
+    }
+
+    function renderPayroll() {
+      const tbody = $("#payrollRows");
+      tbody.replaceChildren();
+
+      if (!data.payroll.length) {
+        const row = tbody.insertRow();
+        addCell(row, "No payslips generated yet.");
+        row.firstChild.colSpan = 3;
+      } else {
+        [...data.payroll].reverse().forEach((slip) => {
+          const row = tbody.insertRow();
+          addCell(row, employeeName(employeeById(slip.employeeId)));
+          addCell(row, slip.period);
+          addCell(row, money(slip.netPay));
+        });
+      }
+
+      const latest = data.payroll[data.payroll.length - 1];
+      $("#latestPay").textContent = latest ? money(latest.netPay) : "—";
+    }
+
+    function renderReviews() {
+      const tbody = $("#reviewRows");
+      tbody.replaceChildren();
+
+      if (!data.reviews.length) {
+        const row = tbody.insertRow();
+        addCell(row, "No reviews added yet.");
+        row.firstChild.colSpan = 5;
+      } else {
+        [...data.reviews].reverse().forEach((review) => {
+          const person = employeeById(review.employeeId);
+          const row = tbody.insertRow();
+          addCell(row, employeeName(person));
+          addCell(row, person?.department ?? "");
+          addCell(row, review.date);
+          addCell(row, `${review.rating} / 5`);
+          addCell(row, review.feedback);
+        });
+      }
+
+      $("#reviewCount").textContent = data.reviews.length;
+    }
+
+    function render() {
+      $("#employeeCount").textContent = data.employees.length;
+      renderEmployees($("#searchForm").elements.search.value);
+      renderRecentEmployees();
+      renderEmployeeOptions();
+      renderAttendance();
+      renderPayroll();
+      renderReviews();
+    }
+
+    function showPage(name) {
+      $$("[data-section]").forEach((section) => {
+        section.hidden = section.dataset.section !== name;
+      });
+
+      $$("[data-page]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.page === name);
+      });
+
+      const names = {
+        overview: "Overview",
+        employees: "Employees",
+        attendance: "Attendance",
+        payroll: "Payroll",
+        performance: "Performance"
+      };
+
+      $("#breadcrumb").textContent = `Workspace / ${names[name]}`;
+    }
+
+    $$("[data-page]").forEach((button) => {
+      button.addEventListener("click", () => showPage(button.dataset.page));
+    });
+
+    $$("[data-open]").forEach((button) => {
+      button.addEventListener("click", () => showPage(button.dataset.open));
+    });
+
+    $("#showEmployeeForm").addEventListener("click", () => {
+      $("#employeeForm").hidden = !$("#employeeForm").hidden;
+    });
+
+    $("#cancelEmployee").addEventListener("click", () => {
+      $("#employeeForm").reset();
+      $("#employeeForm").hidden = true;
+    });
+
+    $("#employeeForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const fields = Object.fromEntries(new FormData(event.currentTarget));
+      const duplicate = data.employees.some(
+        (person) => person.email.toLowerCase() === fields.email.trim().toLowerCase()
+      );
+
+      if (duplicate) {
+        showToast("That email address is already in the demo.");
+        return;
+      }
+
+      const nextId = Math.max(1000, ...data.employees.map((person) => person.id)) + 1;
+
+      data.employees.push({
+        id: nextId,
+        firstName: fields.firstName.trim(),
+        lastName: fields.lastName.trim(),
+        email: fields.email.trim(),
+        department: fields.department.trim(),
+        jobTitle: fields.jobTitle.trim(),
+        salary: Number(fields.salary)
+      });
+
+      event.currentTarget.reset();
+      event.currentTarget.hidden = true;
+      saveAndRender();
+      showToast("Employee added.");
+    });
+
+    $("#searchForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      renderEmployees(event.currentTarget.elements.search.value);
+    });
+
+    $("#searchForm").addEventListener("reset", () => {
+      setTimeout(() => renderEmployees(), 0);
+    });
+
+    $("#attendanceForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const employeeId = Number(event.submitter.form.elements.employeeId.value);
+      const action = event.submitter.value === "in" ? "Clock in" : "Clock out";
+
+      data.attendance.push({
+        employeeId,
+        action,
+        time: new Date().toISOString()
+      });
+
+      saveAndRender();
+      showToast(`${action} recorded.`);
+    });
+
+    $("#payrollForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const fields = Object.fromEntries(new FormData(event.currentTarget));
+      const person = employeeById(fields.employeeId);
+
+      if (!person) {
+        showToast("Add an employee before generating a payslip.");
+        return;
+      }
+
+      const bonus = Number(fields.bonus) || 0;
+      const deductions = Number(fields.deductions) || 0;
+      const netPay = Math.max(0, Number(person.salary) + bonus - deductions);
+
+      const slip = {
+        employeeId: person.id,
+        period: fields.period,
+        netPay
+      };
+
+      data.payroll.push(slip);
+      saveAndRender();
+
+      const result = $("#payslipResult");
+      result.textContent =
+        `${employeeName(person)} — ${slip.period}. ` +
+        `Base salary: ${money(person.salary)}. ` +
+        `Bonus: ${money(bonus)}. Deductions: ${money(deductions)}. ` +
+        `Net pay: ${money(netPay)}.`;
+
+      result.hidden = false;
+      showToast("Sample payslip generated.");
+    });
+
+    $("#reviewForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const fields = Object.fromEntries(new FormData(event.currentTarget));
+
+      data.reviews.push({
+        employeeId: Number(fields.employeeId),
+        date: fields.date,
+        rating: Number(fields.rating),
+        feedback: fields.feedback.trim()
+      });
+
+      event.currentTarget.reset();
+      saveAndRender();
+      showToast("Performance review saved.");
+    });
+
+    render();
+  </script>
+</body>
+</html>
